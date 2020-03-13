@@ -1,3 +1,4 @@
+// nb: file ini berada pada /home/sun/khusus
 #include <wait.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -43,54 +44,58 @@ int main() {
   close(STDERR_FILENO);
 
 	while(1) {
-	    char foldername[100] = "/home/sun/khusus/";
-       	char strtime[100];
-       	time_t t_folder = time(NULL);
-       	struct tm *t = localtime(&t_folder);
-       	strftime(strtime, sizeof(foldername)-1, "%Y-%m-%d_%H:%M:%S", t);
-       	strcat(foldername,strtime);
-       	
+	        char foldername[100] = "/home/sun/khusus/";
+        	char strtime[100];
+        	time_t t_folder = time(NULL);
+        	struct tm *t = localtime(&t_folder);
+        	strftime(strtime, sizeof(foldername)-1, "%Y-%m-%d_%H:%M:%S", t);
+        	strcat(foldername,strtime);
+
 		pid_t pid1 = fork();
-       	int status1;
-       	if(pid1 == 0) {
+        	int status1;
+        	if(pid1 == 0) {
 			pid_t pid2 = fork();
 			int status2;
+			//2a) membuat folder dg nama timestamp tiap 30 detik
 			if(pid2 == 0) {
-                char *arg1[]={"mkdir",foldername,NULL};
+                		char *arg1[]={"mkdir",foldername,NULL};
 				execv("/bin/mkdir", arg1);
-        	}
-        	else {
-        		while((wait(&status2)) > 0);
+        		}
+        		else {
+				//2b)  download 20 gambar dg nama time stamp tiap 5 detik
+        			while((wait(&status2)) > 0);
 				for(int i=0; i<20; i++) {
 					pid_t pid3 = fork();
 					if(pid3 == 0) {
 						time_t t_file = time(NULL);
-		            	struct tm *tp = localtime(&t_file);
+			                	struct tm *tp = localtime(&t_file);
 
-		                char filename[100];
-	        		    strcpy(filename, foldername);
+			                        char filename[100];
+	        		                strcpy(filename, foldername);
 						strcat(filename,"/");
 
 						char timefilename[100];
-	   	                strftime(timefilename, sizeof(timefilename)-1, "%Y-%m-%d_%H:%M:%S", tp);
+	                	                strftime(timefilename, sizeof(timefilename)-1, "%Y-%m-%d_%H:%M:%S", tp);
 						strcat(filename, timefilename);
-				
-				    	char stime[10];
-	                    strftime(stime, sizeof(stime)-1, "%S", tp);
-        	            int st = atoi(stime);
-                	    st = (st%1000)+100;
 
-	                    sprintf(stime, "%d", st);
 
-	                    char linkphoto[100];
-		                strcpy(linkphoto,"https://picsum.photos/");
-        		        strcat(linkphoto,stime);
+                	                	char stime[10];
+	                        	        strftime(stime, sizeof(stime)-1, "%S", tp);
+        	                        	int st = atoi(stime);
+                	                	st = (st%1000)+100;
+
+	                                	sprintf(stime, "%d", st);
+
+	                                	char linkphoto[100];
+		                                strcpy(linkphoto,"https://picsum.photos/");
+        		                        strcat(linkphoto,stime);
 
 						char *arg2[]={"wget","-O",filename,linkphoto,NULL};
-        	       		execv("/usr/bin/wget", arg2);
+        	                		execv("/usr/bin/wget", arg2);
 					}
 					sleep(5);
 				}
+				//2c) zip folder yang sudah berisi 20 file
 				pid_t pid4 = fork();
 				int status4;
 				if(pid4 == 0) {
@@ -107,6 +112,6 @@ int main() {
 				}
 			}
 		}
-        sleep(30);
+                sleep(30);
 	}
 }
