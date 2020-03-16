@@ -14,23 +14,39 @@ source code: [soal1.c](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A1
 ### penyelesaian & penjelasan soal
 Buatlah program C yang menyerupai crontab untuk menjalankan script bash dengan ketentuan sebagai berikut:
 
-  a. Program menerima 4 argumen berupa: 
+  **a. Program menerima 4 argumen berupa:**
       
       i. Detik: 0-59 atau * (any value) 
       ii. Menit: 0-59 atau * (any value) 
       iii. Jam: 0-23 atau * (any value) 
       iv. Path file .sh 
+      
+Di soal ini kita mendapat informasi bahwa kita membutuhkan empat variabel untuk menampung semua argumen yang diberikan. Variabel-variabel ini adalah:
+* `char path[30];` digunakan untuk menyimpan direktori file yang akan di-bash. Variabel ini menggunakan `argv[4]` yang memuat dimana letak file yang akan di-bash. Fungsi `strcpy(path,argv[4])` berfungsi untuk melakukan copy string dari `argv[4]` ke `path[30]`
+* `int sec, min, hour1` digunakan untuk menyimpan input kapan program akan dijalankan. Variabel ini menggunakan `argv[1]` untuk variabel `sec`, `argv[2]` untuk variabel `min`, dan `argv[3]` untuk variabel `hour`. variabel ini menyimpan data dalam bentuk integer, sedangkan semua argumen pada 'argv[]` masih berupa string. Untuk itu, kita menggunakan fungsi `atoi()` untuk melakukan konversi dari string ke integer
+
+Selain variabel-variabel ini. beberapa variabel tambahan dibutuhkan untuk mendapatkan waktu pada sistem. Variabel-variabel itu adalah:
+* `struct *tm timeinfo` untuk menyimpan waktu yang ada di server. Kita menggunakan `time_t rawtime = time(NULL);` dan `localtime(&rawtime)` untuk mendapatkan waktu sistem.
+* `char *arg1[]` untuk menyimoan argumen-argumen yang dibutuhkan untuk menjalankan program. Di dalam variabel ini adalah `{"bash",path,NULL}` yang digunakan untuk menjalankan program bash di dalam Linux.
   
-  b. Program akan mengeluarkan pesan error jika argumen yang diberikan tidak sesuai 
+**b. Program akan mengeluarkan pesan error jika argumen yang diberikan tidak sesuai** 
+ 
+Kita menggunakan pengecekan kondisi `argv[]` dengan menggunakan `argc` dan beberapa percabangan `if`. `argc` digunakan untuk mengecek apakah argumen yang digunakan memiliki jumlah yang dibutuhkan dalam program. Program ini memerlukan 5 argumen untuk menjalankan program. Jika argumen yang diberikan tidak sama dengan 5, maka program akan mengeluarkan pesan error dan melakukan return bernilai 0.
+
+Percabangan `if` digunakan untuk mengecek input waktu yang diberikan. Jika dalam input diberi tanda * (yang merupakan wildcard), program akan memberi flag yang menandakan bahwa program itu dijalankan untuk setiap satuan waktu yang bertanda * dan jika tidak bertanda * , maka program akan menjalankan fungsi `atoi()` untuk mengubah string di `argv[]` ke bentuk integer untuk setiap variabel yang bersangkutan. Lalu, terdapat percabangan `if` untuk mengecek apakah input yang diberikan masih berada di dalam range input yang diperbolehkan. Jika input yang diberikan tidak berada di dalam range input, maka program akan memberikan pesan error dan melakukan return bernilai 0.
   
-  c. Program hanya menerima 1 config cron 
+**c. Program hanya menerima 1 config cron** 
   
+Program ini hanya menerima input langsung dari terminal sehingga kita tidak menggunakan fungsi `scanf`.
+ 
   d. Program berjalan di background (daemon) 
   
   e. Tidak boleh menggunakan fungsi system()    
 
 Contoh: ./program \* 34 7 /home/somi/test.sh 
         Program dengan argumen seperti contoh di atas akan menjalankan script test.sh setiap detik pada jam 07:34.
+	
+Program ini bekerja dengan cara membandingkan waktu sistem dengan waktu yang dikehendaki di input. Pertama, program akan melakukan refresh terhadap variabel `localtime`. Jika dalam input menggunakan wildcard * , maka program tidak akan mengecek waktu sistem. Setelah semua kriteria terpenuhi, maka program akan menggunakan variabel `arg1[]` untuk menjalankan fungsi `execv("/bin/bash",arg1);` setelah program dijalankan, program akan `sleep` selama 1 detik dan memulai proses dari awal.
         
         
 ## soal2
