@@ -14,40 +14,108 @@ source code: [soal1.c](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A1
 ### penyelesaian & penjelasan soal
 Buatlah program C yang menyerupai crontab untuk menjalankan script bash dengan ketentuan sebagai berikut:
 
-  **a. Program menerima 4 argumen berupa:**
+**1a) Program menerima 4 argumen berupa:**
       
       i. Detik: 0-59 atau * (any value) 
       ii. Menit: 0-59 atau * (any value) 
       iii. Jam: 0-23 atau * (any value) 
       iv. Path file .sh 
       
+Penyelesaian untuk soal 1a:
+```
+		// cek apakah argumen berjumlah 5
+	       	if(argc!=5) {
+              		printf("argumen tidak sesuai.\n");
+                	return 0;
+        	}
+		
+		// meng-copykan argv[4] ke path
+        	char path[30];
+        	strcpy(path,argv[4]);
+
+        	int sec, min, hour;
+
+		// cek detik
+        	if((argv[1][0]=='*') && (strlen(argv[1])==1))
+                        sec=-1;
+                else {
+			sec=atoi(argv[1]);
+			if(sec<0 || sec > 59) {
+                        	printf("argumen tidak sesuai.\n");
+                        	return 0;
+                	}
+		}
+
+		// cek menit
+		if((argv[2][0]=='*') && (strlen(argv[2])==1))
+                        min=-1;
+                else {
+			min=atoi(argv[2]);
+			if(min<0 || min>59) {
+                                printf("argumen tidak sesuai.\n");
+                                return 0;
+                        }
+
+		}
+
+		// cek jam
+                if((argv[3][0]=='*') && (strlen(argv[3])==1))
+                        hour=-1;
+		else {
+			hour=atoi(argv[3]);
+			if(hour<0 || hour>23) {
+                                printf("argumen tidak sesuai.\n");
+                                return 0;
+                        }
+		}
+		time_t rawtime = time(NULL);
+  		struct tm *timeinfo = localtime(&rawtime);
+```
+
 Di soal ini kita mendapat informasi bahwa kita membutuhkan empat variabel untuk menampung semua argumen yang diberikan. Variabel-variabel ini adalah:
 * `char path[30];` digunakan untuk menyimpan direktori file yang akan di-bash. Variabel ini menggunakan `argv[4]` yang memuat dimana letak file yang akan di-bash. Fungsi `strcpy(path,argv[4])` berfungsi untuk melakukan copy string dari `argv[4]` ke `path[30]`
-* `int sec, min, hour1` digunakan untuk menyimpan input kapan program akan dijalankan. Variabel ini menggunakan `argv[1]` untuk variabel `sec`, `argv[2]` untuk variabel `min`, dan `argv[3]` untuk variabel `hour`. variabel ini menyimpan data dalam bentuk integer, sedangkan semua argumen pada 'argv[]` masih berupa string. Untuk itu, kita menggunakan fungsi `atoi()` untuk melakukan konversi dari string ke integer
+* `int sec, min, hour` digunakan untuk menyimpan input kapan program akan dijalankan. 
+* Variabel ini menggunakan `argv[1]` untuk variabel `sec`, `argv[2]` untuk variabel `min`, dan `argv[3]` untuk variabel `hour`. variabel ini menyimpan data dalam bentuk integer, sedangkan semua argumen pada 'argv[]` masih berupa string. Untuk itu, kita menggunakan fungsi `atoi()` untuk melakukan konversi dari string ke integer
 
 Selain variabel-variabel ini. beberapa variabel tambahan dibutuhkan untuk mendapatkan waktu pada sistem. Variabel-variabel itu adalah:
 * `struct *tm timeinfo` untuk menyimpan waktu yang ada di server. Kita menggunakan `time_t rawtime = time(NULL);` dan `localtime(&rawtime)` untuk mendapatkan waktu sistem.
 * `char *arg1[]` untuk menyimoan argumen-argumen yang dibutuhkan untuk menjalankan program. Di dalam variabel ini adalah `{"bash",path,NULL}` yang digunakan untuk menjalankan program bash di dalam Linux.
+
   
-**b. Program akan mengeluarkan pesan error jika argumen yang diberikan tidak sesuai** 
+**1b) Program akan mengeluarkan pesan error jika argumen yang diberikan tidak sesuai** 
  
 Kita menggunakan pengecekan kondisi `argv[]` dengan menggunakan `argc` dan beberapa percabangan `if`. `argc` digunakan untuk mengecek apakah argumen yang digunakan memiliki jumlah yang dibutuhkan dalam program. Program ini memerlukan 5 argumen untuk menjalankan program. Jika argumen yang diberikan tidak sama dengan 5, maka program akan mengeluarkan pesan error dan melakukan return bernilai 0.
 
-Percabangan `if` digunakan untuk mengecek input waktu yang diberikan. Jika dalam input diberi tanda * (yang merupakan wildcard), program akan memberi flag yang menandakan bahwa program itu dijalankan untuk setiap satuan waktu yang bertanda * dan jika tidak bertanda * , maka program akan menjalankan fungsi `atoi()` untuk mengubah string di `argv[]` ke bentuk integer untuk setiap variabel yang bersangkutan. Lalu, terdapat percabangan `if` untuk mengecek apakah input yang diberikan masih berada di dalam range input yang diperbolehkan. Jika input yang diberikan tidak berada di dalam range input, maka program akan memberikan pesan error dan melakukan return bernilai 0.
+Percabangan `if` digunakan untuk mengecek input waktu yang diberikan. Jika dalam input diberi tanda * (yang merupakan wildcard), program akan memberi flag yang menandakan bahwa program itu dijalankan untuk setiap satuan waktu (inisialisasi menjadi -1) yang bertanda * dan jika tidak bertanda * , maka program akan menjalankan fungsi `atoi()` untuk mengubah string di `argv[]` ke bentuk integer untuk setiap variabel yang bersangkutan. Lalu, terdapat percabangan `if` untuk mengecek apakah input yang diberikan masih berada di dalam range input yang diperbolehkan. Jika input yang diberikan tidak berada di dalam range input, maka program akan memberikan pesan error dan melakukan return bernilai 0.
   
-**c. Program hanya menerima 1 config cron** 
+**1c) Program hanya menerima 1 config cron** 
   
 Program ini hanya menerima input langsung dari terminal sehingga kita tidak menggunakan fungsi `scanf`.
  
-  d. Program berjalan di background (daemon) 
+**1d) Program berjalan di background (daemon)**
+
+Dengan template daemon, maka potongan kode untuk menyelesaikan soal1 diisikan ke dalam `while()`
   
-  e. Tidak boleh menggunakan fungsi system()    
+**1e) Tidak boleh menggunakan fungsi system()** 
 
 Contoh: ./program \* 34 7 /home/somi/test.sh 
         Program dengan argumen seperti contoh di atas akan menjalankan script test.sh setiap detik pada jam 07:34.
-	
+
+Untuk menjalankan bash seperti crontab, diselesaikan dengan potongan kode berikut:
+
+```
+		// menjalankan bash saat waktu sesuai input (seperti cron)
+		if((timeinfo->tm_sec == sec || sec==-1) && (timeinfo->tm_min == min  || min==-1) && (timeinfo->tm_hour == hour || hour==-1)) {
+			pid_t pid1 =  fork();
+			if(pid1 == 0) {
+				char *arg1[]={"bash",path,NULL};
+				execv("/bin/bash",arg1);
+			}
+		}
+   		sleep(1);
+```
 Program ini bekerja dengan cara membandingkan waktu sistem dengan waktu yang dikehendaki di input. Pertama, program akan melakukan refresh terhadap variabel `localtime`. Jika dalam input menggunakan wildcard * , maka program tidak akan mengecek waktu sistem. Setelah semua kriteria terpenuhi, maka program akan menggunakan variabel `arg1[]` untuk menjalankan fungsi `execv("/bin/bash",arg1);` setelah program dijalankan, program akan `sleep` selama 1 detik dan memulai proses dari awal.
-        
+
         
 ## soal2
 source code: [soal2.c](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A10/blob/master/soal2/soal2.c)
