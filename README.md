@@ -116,7 +116,18 @@ Untuk menjalankan bash seperti crontab, diselesaikan dengan potongan kode beriku
 ```
 Program ini bekerja dengan cara membandingkan waktu sistem dengan waktu yang dikehendaki di input. Pertama, program akan melakukan refresh terhadap variabel `localtime`. Jika dalam input menggunakan wildcard * , maka program tidak akan mengecek waktu sistem. Setelah semua kriteria terpenuhi, maka program akan menggunakan variabel `arg1[]` untuk menjalankan fungsi `execv("/bin/bash",arg1);` setelah program dijalankan, program akan `sleep` selama 1 detik dan memulai proses dari awal.
 
-        
+**run program:** 
+
+Pada terminal dilakukan compile soal1.c dengan `gcc soal1.c -o soal1`.
+
+Kemudian dilakukan bash `./soal1 \* 34 7 soal3.sh` untuk menjalankan program.
+
+Program dengan argumen seperti contoh di atas akan menjalankan script soal3.sh (soal3-modul1) setiap detik pada jam 07:47.
+	
+![soal1](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A10/blob/master/pictures/1.png)
+
+	
+	
 ## soal2
 source code: [soal2.c](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A10/blob/master/soal2/soal2.c)
 
@@ -226,6 +237,26 @@ Dilakukan fork() dimana:
 
 **2e) Kiwa menambahkan bahwa program utama bisa dirun dalam dua mode, yaitu MODE_A dan MODE_B. untuk mengaktifkan MODE_A, program harus dijalankan dengan argumen -a. Untuk MODE_B, program harus dijalankan dengan argumen -b. Ketika dijalankan dalam MODE_A, program utama akan langsung menghentikan semua operasinya ketika program killer dijalankan. Untuk MODE_B, ketika program killer dijalankan, program utama akan berhenti tapi membiarkan proses di setiap folder yang masih berjalan sampai selesai(semua folder terisi gambar, terzip lalu di delete).**
 
+**run program:**
+
+Pada terminal, dilakukan bash `cd ./khusus` untuk change directory ke khusus, di dalamnya terdapat soal2.c
+
+Selanjutnya dilakukan compile soal2.c dengan `gcc soal2.c -o soal2`.
+
+Kemudian dilakukan bash `./soal2` untuk menjalankan program. Program akan membuat folder setiap 30 detik.
+
+![soal2.1](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A10/blob/master/pictures/2.1.png)
+
+Setiap folder akan berisi 20 foto hasil download (setiap 5 detik).
+
+![soal2.2](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A10/blob/master/pictures/2.2.png)
+
+Setiap folder yang sudah berisi 20 foto kemudian akan di zip.
+
+![soal2.3](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A10/blob/master/pictures/2.3.png)
+
+ps. karena belum menyelesaikan soal 2d, maka untuk memberhentikan proses dilakukan dengan bash `killall -s 9 soal2`.
+
 **kendala**
 
 soal 2d dan 2e belum selesai. 
@@ -324,3 +355,25 @@ else {
     * `find /home/sun/modul2/jpg` command untuk mencari /home/sun/modul2/jpg
     *  `! -path /home/sun/modul2/indomie -prune` kecuali path /home/sun/modul2/indomie akan di `-prune` yaitu untuk mencegah melakukan find ke path tersebut
      * `-exec touch {}/coba2.txt ;` hasil find kemudian akan dilakukan `touch` atau membuat file kosong coba2.txt
+
+**run program:**
+
+Pada terminal, dilakukan compile soal2.c dengan `gcc soal3.c -o soal3`. Pastikan sudah terdapat direktori modul2 dimana sudah berisi jpg.zip
+
+Kemudian dilakukan bash `./soal3` untuk menjalankan program. 
+
+![soal3](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A10/blob/master/pictures/3.png)
+
+Program kemudian akan membuat folder indomie dan sedaap. Kemudian program akan meng-unzip jpg.zip
+
+Pada folder sedaap, akan dipindahkan file-file yang ada di folder jpg hasil unzip.
+
+![3sedaap](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A10/blob/master/pictures/3sedaap.png)
+
+Dan pada folder indomie, akan dipindahkan folder-folder yang ada di folder jpg hasil unzip.
+
+![3indomie](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A10/blob/master/pictures/3indomie.png)
+
+Pada setiap folder di indomie, akan berisi coba1.txt dan 5 detik kemudian coba2.txt
+
+![3coba](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A10/blob/master/pictures/3coba.png)
