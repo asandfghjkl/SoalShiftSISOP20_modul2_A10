@@ -237,6 +237,51 @@ Dilakukan fork() dimana:
 
 **2e) Kiwa menambahkan bahwa program utama bisa dirun dalam dua mode, yaitu MODE_A dan MODE_B. untuk mengaktifkan MODE_A, program harus dijalankan dengan argumen -a. Untuk MODE_B, program harus dijalankan dengan argumen -b. Ketika dijalankan dalam MODE_A, program utama akan langsung menghentikan semua operasinya ketika program killer dijalankan. Untuk MODE_B, ketika program killer dijalankan, program utama akan berhenti tapi membiarkan proses di setiap folder yang masih berjalan sampai selesai(semua folder terisi gambar, terzip lalu di delete).**
 
+------------------revisi 2d & 2e-----------------
+
+Di main akan ditambahkan parameter `int argc, char **argv` dimana `int argc` ialah jumlah argumen yang masuk, dan `char **argv` merupakan string argumen. Dari argumen yang masuk, dicek apakah sesuai dengan yang diminta. Jika tidak maka program akan keluar.
+```
+if (argc != 2) {
+    exit(EXIT_FAILURE);
+  }
+	char killername[100];
+	strcpy(killername, "/home/sun/khusus/killer.sh");
+	FILE *killer = fopen(killername, "w");
+
+	if(strcmp(argv[1], "-a") == 0) {
+		fprintf(killer, "#!/bin/bash\nkillall -9 soal2\nrm %s", killername);
+	}
+	else if(strcmp(argv[1], "-b") == 0) {
+                fprintf(killer, "#!/bin/bash\nkill %d\nrm %s", getpid(), killername);
+        }
+	else {
+		fclose(killer);
+		exit(EXIT_FAILURE);
+	}
+
+	pid_t pidk = fork();
+	if(pidk == 0) {
+		char *arg[]={"chmod","x",killername,NULL};
+		execv("/bin/chmod", arg);
+	}
+	fclose(killer);
+
+```
+* `if (argc != 2)` Jika argumen tidak berjumlah 2 maka program keluar.
+* `char killername[100]; strcpy(killername, "/home/sun/khusus/killer.sh");` nama file killer akan disimpan pada variabel killername
+* `FILE *killer = fopen(killername, "w");` dibuat (`w`) file killer dengan nama killername. apabila file killer sudah ada, maka akan di overwrite
+* Untuk soal 2e
+	* `if(strcmp(argv[1], "-a") == 0)` apabila MODE_A dengan dicek argv[1] apakah "-a" jika iya, maka file killer akan diisikan `fprintf(killer, "#!/bin/bash\nkillall -9 soal2\nrm %s", killername);` 
+		* `killall -9 soal2` untuk kill program soal2 yang berjalan, -9 atau SIGKILL berarti semua program akan langsung di kill.
+		* `rm %s` dimana `%s` disini ialah `killername` untuk menghapus file killer itu sendiri setelahnya
+		
+	* `else if(strcmp(argv[1], "-b") == 0)` apabila MODE_B dengan dicek argv[1] apakah "-a" jika iya, maka file killer akan diisikan  `fprintf(killer, "#!/bin/bash\nkill %d\nrm %s", getpid(), killername);`
+		* `kill %d` dimana `%d` disini ialah `getpid()` atau parent nya sehingga hanya kill parent saja
+		* `rm %s` dimana `%s` disini ialah `killername` untuk menghapus file killer itu sendiri setelahnya
+* Kemudian dilakukan fork() untuk ekseskusi `chmod x killername` agar file killer bisa di bash
+* File killer kemudian di close `fclose(killer);`
+
+	
 **run program:**
 
 Pada terminal, dilakukan bash `cd ./khusus` untuk change directory ke khusus, di dalamnya terdapat soal2.c
@@ -255,11 +300,16 @@ Setiap folder yang sudah berisi 20 foto kemudian akan di zip.
 
 ![soal2.3](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A10/blob/master/pictures/2.3.png)
 
-ps. karena belum menyelesaikan soal 2d, maka untuk memberhentikan proses dilakukan dengan bash `killall -s 9 soal2`.
+--------------revisi-------------
+bash dilakukan sesuai mode program dengan menyertakan argumen, misal `./soal2 -b` maka program akan berjalan dengan MODE_B yaitu apabila bash file killer.sh dilakukan maka program akan tetap berjalan hingga semua file berhasil di zip.
+
+![soal2revised](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A10/blob/master/pictures/2revised.png)
+![soal2zip](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A10/blob/master/pictures/2zip.png)
+
 
 **kendala**
 
-soal 2d dan 2e belum selesai. 
+soal 2d dan 2e belum selesai. (sudah direvisi)
 
 ## soal3
 source code: [soal3.c](https://github.com/asandfghjkl/SoalShiftSISOP20_modul2_A10/blob/master/soal3/soal3.c)
