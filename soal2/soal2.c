@@ -11,7 +11,11 @@
 #include <errno.h>
 #include <syslog.h>
 
-int main() {
+int main(int argc, char **argv) {
+  if (argc != 2) {
+    exit(EXIT_FAILURE);
+  }
+
   pid_t pid, sid;        // Variabel untuk menyimpan PID
 
   pid = fork();     // Menyimpan PID dari Child Process
@@ -43,8 +47,26 @@ int main() {
   close(STDOUT_FILENO);
   close(STDERR_FILENO);
 
+	char killername[100];
+	strcpy(killername, "/home/sun/khusus/killer.sh");
+	FILE *killer = fopen(killername, "w");
+
+	if(strcmp(argv[1], "-a") == 0) {
+		fprintf(killer, "#!/bin/bash\nkillall -9 soal2\nrm %s", killername);
+	}
+	if(strcmp(argv[1], "-b") == 0) {
+                fprintf(killer, "#!/bin/bash\nkill %d\nrm %s", getpid(), killername);
+        }
+
+	pid_t pidk = fork();
+	if(pidk == 0) {
+		char *arg[]={"chmod","x",killername,NULL};
+		execv("/bin/chmod", arg);
+	}
+	fclose(killer);
+
 	while(1) {
-	        char foldername[100] = "/home/sun/khusus/";
+		char foldername[100] = "/home/sun/khusus/";
         	char strtime[100];
         	time_t t_folder = time(NULL);
         	struct tm *t = localtime(&t_folder);
