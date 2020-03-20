@@ -54,9 +54,13 @@ int main(int argc, char **argv) {
 	if(strcmp(argv[1], "-a") == 0) {
 		fprintf(killer, "#!/bin/bash\nkillall -9 soal2\nrm %s", killername);
 	}
-	if(strcmp(argv[1], "-b") == 0) {
+	else if(strcmp(argv[1], "-b") == 0) {
                 fprintf(killer, "#!/bin/bash\nkill %d\nrm %s", getpid(), killername);
         }
+	else {
+		fclose(killer);
+		exit(EXIT_FAILURE);
+	}
 
 	pid_t pidk = fork();
 	if(pidk == 0) {
